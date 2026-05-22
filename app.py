@@ -116,7 +116,7 @@ if st.button("🚀 Generate Map"):
 
         import io
         buf = io.BytesIO()
-        fig.savefig(buf, format="png", dpi=1300, bbox_inches='tight')
+        fig.savefig(buf, format="png", dpi=800, bbox_inches='tight')
         buf.seek(0)
 
         st.download_button(
