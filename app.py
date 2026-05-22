@@ -117,13 +117,18 @@ def bearing_to_compass(angle):
 # GENERATE BUTTON
 # =============================
 
-colA, colB, colC = st.columns(3)
+colA, colB = st.columns(2)
 
 # =============================
 # GENERATE MAP BUTTON
 # =============================
+ colA, colB = st.columns(2)
+
+# =============================
+# GENERATE MAP
+# =============================
 with colA:
-    if st.button("Generate Map"):
+    if st.button("🚀 Generate Map"):
 
         wind_radii = {
             "strong": [(0, 90, strong_NE), (90, 180, strong_SE),
@@ -143,52 +148,42 @@ with colA:
         fig.set_dpi(150)
         st.pyplot(fig)
 
-        import io
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", dpi=800, bbox_inches='tight')
-        buf.seek(0)
 
-        st.download_button(
-            "Download Map (PNG)",
-            data=buf,
-            file_name="typhoon_map.png",
-            mime="image/png"
-        )
-        
 # =============================
-# DISTANCE BUTTON ✅ NEW
+# ✅ MERGED: DISTANCE + MOTION
 # =============================
 with colB:
-    if st.button("Distance"):
+    if st.button("📏 Distance & Motion"):
 
-        lat0 = lats[0]
-        lon0 = lons[0]
-
-        dist = haversine(MACAU_LAT, MACAU_LON, lat0, lon0)
-        ang = bearing(MACAU_LAT, MACAU_LON, lat0, lon0)
-        direction = bearing_to_compass(ang)
-
-        st.success(
-            f"Distance from Macau: {direction} {dist:.0f} km"
-        )
-
-    if len(lats) < 2:
+        if len(lats) < 2:
             st.error("Need at least 0H and 12H points")
         else:
+            MACAU_LAT = 22.1595
+            MACAU_LON = 113.5685
+
+            # =============================
+            # Distance from Macau
+            # =============================
             lat0, lon0 = lats[0], lons[0]
+
+            dist_macau = haversine(MACAU_LAT, MACAU_LON, lat0, lon0)
+            ang_macau = bearing(MACAU_LAT, MACAU_LON, lat0, lon0)
+            dir_macau = bearing_to_compass(ang_macau)
+
+            # =============================
+            # Motion (0H → 12H)
+            # =============================
             lat1, lon1 = lats[1], lons[1]
 
-            dist = haversine(lat0, lon0, lat1, lon1)
-            ang = bearing(lat0, lon0, lat1, lon1)
+            dist_move = haversine(lat0, lon0, lat1, lon1)
+            ang_move = bearing(lat0, lon0, lat1, lon1)
+            dir_move = bearing_to_compass(ang_move)
 
-            direction = bearing_to_compass(ang)
-
-            # hours difference (normally 12h)
             time_diff = hours[1] - hours[0]
+            speed = dist_move / time_diff
 
-            speed = dist / time_diff  # km/h
-
-            st.success(
-                f"Movement: {direction} at {speed:.1f} km/h"
-            )
-
+            # =============================
+            # DISPLAY
+            # =============================
+            st.success(f"📍 Macau: {dir_macau} {dist_macau:.0f} km")
+            st.success(f"🌀 Motion: {dir_move} at {speed:.1f} km/h")
