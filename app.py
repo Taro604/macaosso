@@ -10,11 +10,14 @@ num_past = st.slider("Number of past points", 0, 10, 3)
 
 past_lats = []
 past_lons = []
+past_intensities = []  # ✅ NEW
+
+intensity_options = ["LPA", "TD", "TS", "STS", "TY", "STY", "SuTY", "EX"]
 
 for i in range(num_past):
     st.write(f"Past Point {i+1}")
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     plat = col1.number_input(
         f"Past Lat {i+1}",
@@ -32,8 +35,16 @@ for i in range(num_past):
         key=f"plon{i}"
     )
 
+    pintensity = col3.selectbox(
+        f"Intensity {i+1}",
+        intensity_options,
+        index=1,   # default TD
+        key=f"pintensity{i}"
+    )
+
     past_lats.append(plat)
     past_lons.append(plon)
+    past_intensities.append(pintensity)
     
 st.subheader("📍 Forecast Track Input")
 
@@ -170,7 +181,8 @@ with colA:
             wind_radii_input=wind_radii,
             intensities=intensities,
             past_lats=past_lats,   
-            past_lons=past_lons
+            past_lons=past_lons,
+            past_intensities=past_intensities
         )
 
         fig.set_dpi(50)
