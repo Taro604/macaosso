@@ -90,7 +90,7 @@ def plot_wind_radii(ax, center_lon, center_lat, quadrants, color, alpha=0.05):
 # ==========================================
 def create_typhoon_map(user_lats, user_lons, user_hours,
                        intensities, wind_radii_input,
-                       past_lats=None, past_lons=None):
+                       past_lats=None, past_lons=None,ast_intensities=None):
 
     hours = np.array(user_hours)
     lats = np.array(user_lats)
@@ -172,7 +172,8 @@ def create_typhoon_map(user_lats, user_lons, user_hours,
     if past_lats and past_lons and len(past_lats) > 0:
 
         for i in range(len(past_lons)):
-            c = color_map.get("TD", "#6DD8FA")  # default TD color
+            c = color_map.get(past_intensities[i], "#6DD8FA")
+
             ax.scatter(
                 past_lons[i],
                 past_lats[i],
@@ -180,6 +181,7 @@ def create_typhoon_map(user_lats, user_lons, user_hours,
                 s=25,
                 zorder=3
             )
+
 
     # ===============================
     # WIND RADII
