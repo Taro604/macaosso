@@ -123,7 +123,7 @@ colA, colB, colC = st.columns(3)
 # GENERATE MAP BUTTON
 # =============================
 with colA:
-    if st.button("🚀 Generate Map"):
+    if st.button("Generate Map"):
 
         wind_radii = {
             "strong": [(0, 90, strong_NE), (90, 180, strong_SE),
@@ -149,7 +149,7 @@ with colA:
         buf.seek(0)
 
         st.download_button(
-            "📥 Download Map (PNG)",
+            "Download Map (PNG)",
             data=buf,
             file_name="typhoon_map.png",
             mime="image/png"
@@ -159,7 +159,7 @@ with colA:
 # DISTANCE BUTTON ✅ NEW
 # =============================
 with colB:
-    if st.button("📏 Calculate Distance"):
+    if st.button("Distance"):
 
         lat0 = lats[0]
         lon0 = lons[0]
@@ -174,7 +174,7 @@ with colB:
 
 
 with colC:
-    if st.button("🌀 Calculate Motion"):
+    if st.button("12H moving speed and direction"):
 
         if len(lats) < 2:
             st.error("Need at least 0H and 12H points")
