@@ -35,7 +35,6 @@ for i in range(num_points):
 
     lat = col1.number_input(
         f"Lat ({hr}H)",
-        value=10.0,
         format="%.1f",   # ✅ 1 decimal place
         step=0.1,        # ✅ increment by 0.1
         key=f"lat{i}"
@@ -43,7 +42,6 @@ for i in range(num_points):
 
     lon = col2.number_input(
         f"Lon ({hr}H)",
-        value=140.0,
         format="%.1f",
         step=0.1,
         key=f"lon{i}"
