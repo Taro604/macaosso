@@ -166,9 +166,32 @@ def create_typhoon_map(user_lats, user_lons, user_hours,
             print("Icon error:", e)
             ax.plot(lon, lat, 'wo')
 
-    # ===============================
-    # ✅ PAST TRACK (COLORED DOT ONLY)
-    # ===============================
+# ======================================
+# ✅ PAST TRACK (LINE + COLORED DOTS)
+# ======================================
+    if past_lats and past_lons and len(past_lats) > 1:
+
+    # ✅ draw connecting line FIRST (behind)
+        ax.plot(
+            past_lons,
+            past_lats,
+            color="white",
+            linewidth=1,
+            zorder=1   # ✅ BELOW icons
+        )
+
+    # ✅ draw colored dots
+        for i in range(len(past_lons)):
+            c = color_map.get(past_intensities[i], "#6DD8FA")
+
+            ax.scatter(
+                past_lons[i],
+                past_lats[i],
+                color=c,
+                s=25,
+                zorder=2   # ✅ above line, below icons
+            )
+        
     if past_lats and past_lons and len(past_lats) > 0:
 
         for i in range(len(past_lons)):
