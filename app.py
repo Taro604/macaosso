@@ -166,13 +166,35 @@ with colA:
 # 📏 DISTANCE
 with colB:
     if st.button("📏 Distance & Motion"):
-        if len(lats) >= 2 and lats[0] != 0 and lons[0] != 0:
-            d = haversine(lats[0], lons[0], lats[1], lons[1])
-            dir = bearing_to_compass(bearing(lats[0], lons[0], lats[1], lons[1]))
-            speed = d / (hours[1]-hours[0])
 
-            st.success(f"{dir} {d:.0f} km")
-            st.success(f"{dir} at {speed:.1f} km/h")
+        if len(lats) >= 2:
+
+            MACAU_LAT = 22.1595
+            MACAU_LON = 113.5685
+
+            # =============================
+            # Distance from Macau
+            # =============================
+            dist_macau = haversine(MACAU_LAT, MACAU_LON, lats[0], lons[0])
+            dir_macau = bearing_to_compass(
+                bearing(MACAU_LAT, MACAU_LON, lats[0], lons[0])
+            )
+
+            # =============================
+            # Motion (0H → 12H)
+            # =============================
+            dist_move = haversine(lats[0], lons[0], lats[1], lons[1])
+            dir_move = bearing_to_compass(
+                bearing(lats[0], lons[0], lats[1], lons[1])
+            )
+
+            speed = dist_move / (hours[1] - hours[0])
+
+            # =============================
+            # DISPLAY ✅
+            # =============================
+            st.success(f"📍 Macau: {dir_macau} {dist_macau:.0f} km")
+            st.success(f"🌀 Motion: {dir_move} at {speed:.1f} km/h")
 
 # 💾 SAVE (NOW FIXED ✅)
 with colC:
