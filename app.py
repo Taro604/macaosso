@@ -120,11 +120,6 @@ def bearing_to_compass(angle):
 colA, colB = st.columns(2)
 
 # =============================
-# GENERATE MAP BUTTON
-# =============================
- colA, colB = st.columns(2)
-
-# =============================
 # GENERATE MAP
 # =============================
 with colA:
