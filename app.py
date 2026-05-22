@@ -155,8 +155,6 @@ with colA:
             mime="image/png"
         )
         
-    except Exception as e:
-        st.error(f"Error generating map: {e}")
 # =============================
 # DISTANCE BUTTON ✅ NEW
 # =============================
