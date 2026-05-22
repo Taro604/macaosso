@@ -38,6 +38,16 @@ def get_icon_path(intensity):
     }
     return mapping.get(intensity, "TS.png")
 
+color_map = {
+    "LPA": "#DDDFE2",
+    "EX": "#DDDFE2",
+    "TD": "#6DD8FA",
+    "TS": "#9DD79C",
+    "STS": "#FFD363",
+    "TY": "#F78A31",
+    "STY": "#FF6F6F",
+    "SuTY": "#DE82FF"
+}
 
 # ==========================================
 # SMOOTH TRACK
@@ -73,7 +83,9 @@ def plot_wind_radii(ax, center_lon, center_lat, quadrants, color, alpha=0.05, lw
 # ==========================================
 # MAIN FUNCTION
 # ==========================================
-def create_typhoon_map(user_lats, user_lons, user_hours, intensities, wind_radii_input):
+def create_typhoon_map(user_lats, user_lons, user_hours,
+                       intensities, wind_radii_input,
+                       past_lats=None, past_lons=None):
 
     hours = np.array(user_hours)
     lats = np.array(user_lats)
@@ -204,7 +216,37 @@ def create_typhoon_map(user_lats, user_lons, user_hours, intensities, wind_radii
                        linewidth=0.5,
                        transform=ccrs.PlateCarree())
         )
+# ======================================
+# PAST TRACK ✅
+# ======================================
+if past_lats and past_lons and len(past_lats) > 1:
 
+    past_lats_np = np.array(past_lats)
+    past_lons_np = np.array(past_lons)
+
+    t = np.arange(len(past_lats_np))
+    t_smooth = np.linspace(t.min(), t.max(), 100)
+
+    lon_smooth = PchipInterpolator(t, past_lons_np)(t_smooth)
+    lat_smooth = PchipInterpolator(t, past_lats_np)(t_smooth)
+
+    # ✅ smooth line
+    ax.plot(lon_smooth, lat_smooth,
+            color="white",
+            linewidth=1.5,
+            zorder=1)
+
+    # ✅ points
+    ax.scatter(
+        past_lons_np,
+        past_lats_np,
+        color="#6DD8FA",
+        s=20,
+        zorder=2
+    )
+    for i in range(len(past_lons_np)):
+    c = color_map.get(past_intensities[i], "#6DD8FA")
+    ax.scatter(past_lons_np[i], past_lats_np[i], color=c, s=20)
     # ======================================
     # GRID
     # ======================================
