@@ -175,3 +175,13 @@ with colC:
         st.download_button("📥 Download JSON",
                            json.dumps(data, indent=4),
                            file_name="typhoon.json")
+
+    # ✅ LOAD FILE
+    uploaded_file = st.file_uploader("📂 Load File", type=["json"])
+
+    if uploaded_file is not None:
+        data = json.load(uploaded_file)
+
+        st.success("✅ File loaded!")
+
+        st.write(data)
