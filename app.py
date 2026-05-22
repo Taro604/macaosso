@@ -172,11 +172,7 @@ with colB:
             f"Distance from Macau: {direction} {dist:.0f} km"
         )
 
-
-with colC:
-    if st.button("Moving Speed"):
-
-        if len(lats) < 2:
+    if len(lats) < 2:
             st.error("Need at least 0H and 12H points")
         else:
             lat0, lon0 = lats[0], lons[0]
