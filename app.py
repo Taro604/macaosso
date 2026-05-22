@@ -166,7 +166,7 @@ with colA:
 # 📏 DISTANCE
 with colB:
     if st.button("📏 Distance & Motion"):
-        if len(lats) >= 2:
+        if len(lats) >= 2 and lats[0] != 0 and lons[0] != 0:
             d = haversine(lats[0], lons[0], lats[1], lons[1])
             dir = bearing_to_compass(bearing(lats[0], lons[0], lats[1], lons[1]))
             speed = d / (hours[1]-hours[0])
