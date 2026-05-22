@@ -7,7 +7,7 @@ import math
 st.title("🌪 Tropical Cyclone Track Generator")
 
 # ======================================
-# ✅ PAST TRACK (DYNAMIC ROWS)
+# ✅ PAST TRACK
 # ======================================
 st.subheader("🕘 Past Track Input")
 
@@ -29,38 +29,36 @@ with colB:
         if len(st.session_state.past_rows) > 0:
             st.session_state.past_rows.pop()
 
-past_lats = []
-past_lons = []
-past_intensities = []
-
+past_lats, past_lons, past_intensities = [], [], []
 intensity_options = ["LPA", "TD", "TS", "STS", "TY", "STY", "SuTY", "EX"]
 
 for i, row in enumerate(st.session_state.past_rows):
 
     st.write(f"Past Point {i+1}")
+    c1, c2, c3 = st.columns(3)
 
-    col1, col2, col3 = st.columns(3)
-
-    lat = col1.number_input(
-    f"Lat ({hr}H)",
-    value=10.0,        # ✅ FIX
-    step=0.1,
-    format="%.1f",
-    key=f"lat{i}"
+    lat = c1.number_input(
+        f"Past Lat {i+1}",
+        value=row["lat"],
+        step=0.1,
+        format="%.1f",
+        key=f"plat{i}"   # ✅ fixed key
     )
 
-    lon = col2.number_input(
-    f"Lon ({hr}H)",
-    value=140.0,       # ✅ FIX
-    step=0.1,
-    format="%.1f",
-    key=f"lon{i}"
+    lon = c2.number_input(
+        f"Past Lon {i+1}",
+        value=row["lon"],
+        step=0.1,
+        format="%.1f",
+        key=f"plon{i}"   # ✅ fixed key
     )
-    
-    intensity = col3.selectbox(f"Intensity {i+1}",
-                               intensity_options,
-                               index=intensity_options.index(row["intensity"]),
-                               key=f"pintensity{i}")
+
+    intensity = c3.selectbox(
+        f"Intensity {i+1}",
+        intensity_options,
+        index=intensity_options.index(row["intensity"]),
+        key=f"pintensity{i}"
+    )
 
     st.session_state.past_rows[i] = {"lat": lat, "lon": lon, "intensity": intensity}
 
@@ -73,26 +71,40 @@ for i, row in enumerate(st.session_state.past_rows):
 # ======================================
 st.subheader("📍 Forecast Track Input")
 
-fixed_hours = [0, 12, 24, 48, 72, 96, 120]
+fixed_hours = [0,12,24,48,72,96,120]
 num_points = st.slider("Number of forecast points", 2, 7, 5)
 
 lats, lons, hours, intensities = [], [], [], []
-
-intensity_options = ["12H", "TD", "TS", "STS", "TY", "STY", "SuTY", "EX", "LPA"]
+intensity_options = ["12H","TD","TS","STS","TY","STY","SuTY","EX","LPA"]
 
 for i in range(num_points):
     hr = fixed_hours[i]
 
     st.write(f"### {hr}H")
-    col1, col2, col3 = st.columns(3)
+    c1, c2, c3 = st.columns(3)
 
-    lat = col1.number_input(f"Lat ({hr}H)", step=0.1, format="%.1f", key=f"lat{i}")
-    lon = col2.number_input(f"Lon ({hr}H)", step=0.1, format="%.1f", key=f"lon{i}")
+    lat = c1.number_input(
+        f"Lat ({hr}H)",
+        value=10.0,       # ✅ FIXED
+        step=0.1,
+        format="%.1f",
+        key=f"flat{i}"    # ✅ avoid collision
+    )
 
-    intensity = col3.selectbox(f"Intensity ({hr}H)",
-                                intensity_options,
-                                index=2,
-                                key=f"intensity{i}")
+    lon = c2.number_input(
+        f"Lon ({hr}H)",
+        value=140.0,      # ✅ FIXED
+        step=0.1,
+        format="%.1f",
+        key=f"flon{i}"
+    )
+
+    intensity = c3.selectbox(
+        f"Intensity ({hr}H)",
+        intensity_options,
+        index=2,
+        key=f"fintensity{i}"
+    )
 
     lats.append(lat)
     lons.append(lon)
@@ -104,17 +116,17 @@ for i in range(num_points):
 # ======================================
 st.subheader("💨 Wind Radii (km)")
 
-col1, col2, col3, col4 = st.columns(4)
-strong_NE = col1.number_input("NE", value=0, step=10)
-strong_SE = col2.number_input("SE", value=0, step=10)
-strong_SW = col3.number_input("SW", value=0, step=10)
-strong_NW = col4.number_input("NW", value=0, step=10)
+c1,c2,c3,c4 = st.columns(4)
+strong_NE = c1.number_input("NE", 0)
+strong_SE = c2.number_input("SE", 0)
+strong_SW = c3.number_input("SW", 0)
+strong_NW = c4.number_input("NW", 0)
 
-col1, col2, col3, col4 = st.columns(4)
-storm_NE = col1.number_input("Storm NE", value=0, step=10)
-storm_SE = col2.number_input("Storm SE", value=0, step=10)
-storm_SW = col3.number_input("Storm SW", value=0, step=10)
-storm_NW = col4.number_input("Storm NW", value=0, step=10)
+c1,c2,c3,c4 = st.columns(4)
+storm_NE = c1.number_input("Storm NE", 0)
+storm_SE = c2.number_input("Storm SE", 0)
+storm_SW = c3.number_input("Storm SW", 0)
+storm_NW = c4.number_input("Storm NW", 0)
 
 # ======================================
 # ✅ HELPER FUNCTIONS
@@ -122,44 +134,40 @@ storm_NW = col4.number_input("Storm NW", value=0, step=10)
 def haversine(lat1, lon1, lat2, lon2):
     R = 6371.0
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
-    dphi = math.radians(lat2 - lat1)
-    dlambda = math.radians(lon2 - lon1)
-
+    dphi = math.radians(lat2-lat1)
+    dlambda = math.radians(lon2-lon1)
     a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
-    return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    return 2*R*math.atan2(math.sqrt(a), math.sqrt(1-a))
 
 def bearing(lat1, lon1, lat2, lon2):
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
-    dlambda = math.radians(lon2 - lon1)
+    dlambda = math.radians(lon2-lon1)
+    x = math.sin(dlambda)*math.cos(phi2)
+    y = math.cos(phi1)*math.sin(phi2)-math.sin(phi1)*math.cos(phi2)*math.cos(dlambda)
+    return (math.degrees(math.atan2(x,y))+360)%360
 
-    x = math.sin(dlambda) * math.cos(phi2)
-    y = math.cos(phi1)*math.sin(phi2) - math.sin(phi1)*math.cos(phi2)*math.cos(dlambda)
-
-    return (math.degrees(math.atan2(x, y)) + 360) % 360
-
-def bearing_to_compass(angle):
+def bearing_to_compass(a):
     dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE",
             "S","SSW","SW","WSW","W","WNW","NW","NNW"]
-    return dirs[int((angle+11.25)//22.5)%16]
+    return dirs[int((a+11.25)//22.5)%16]
 
 # ======================================
-# ✅ BUTTONS (SAFE POSITION)
+# ✅ BUTTONS
 # ======================================
-colA, colB, colC = st.columns(3)
+colA,colB,colC = st.columns(3)
 
 # 🚀 MAP
 with colA:
     if st.button("🚀 Generate Map"):
-        wind_radii = {
-            "strong": [(0,90,strong_NE),(90,180,strong_SE),(180,270,strong_SW),(270,360,strong_NW)],
-            "storm": [(0,90,storm_NE),(90,180,storm_SE),(180,270,storm_SW),(270,360,storm_NW)]
+        wind = {
+            "strong":[(0,90,strong_NE),(90,180,strong_SE),(180,270,strong_SW),(270,360,strong_NW)],
+            "storm":[(0,90,storm_NE),(90,180,storm_SE),(180,270,storm_SW),(270,360,storm_NW)]
         }
 
         fig = create_typhoon_map(
-            lats, lons, hours,
-            intensities, wind_radii,
-            past_lats, past_lons,
-            past_intensities
+            lats,lons,hours,
+            intensities,wind,
+            past_lats,past_lons,past_intensities
         )
         st.pyplot(fig)
 
@@ -169,50 +177,34 @@ with colB:
 
         if len(lats) >= 2:
 
-            MACAU_LAT = 22.1595
-            MACAU_LON = 113.5685
+            MACAU_LAT, MACAU_LON = 22.1595, 113.5685
 
-            # =============================
-            # Distance from Macau
-            # =============================
-            dist_macau = haversine(MACAU_LAT, MACAU_LON, lats[0], lons[0])
+            d_macau = haversine(MACAU_LAT,MACAU_LON,lats[0],lons[0])
             dir_macau = bearing_to_compass(
-                bearing(MACAU_LAT, MACAU_LON, lats[0], lons[0])
+                bearing(MACAU_LAT,MACAU_LON,lats[0],lons[0])
             )
 
-            # =============================
-            # Motion (0H → 12H)
-            # =============================
-            dist_move = haversine(lats[0], lons[0], lats[1], lons[1])
+            d_move = haversine(lats[0],lons[0],lats[1],lons[1])
             dir_move = bearing_to_compass(
-                bearing(lats[0], lons[0], lats[1], lons[1])
+                bearing(lats[0],lons[0],lats[1],lons[1])
             )
 
-            speed = dist_move / (hours[1] - hours[0])
+            speed = d_move/(hours[1]-hours[0])
 
-            # =============================
-            # DISPLAY ✅
-            # =============================
-            st.success(f"📍 Macau: {dir_macau} {dist_macau:.0f} km")
+            st.success(f"📍 Macau: {dir_macau} {d_macau:.0f} km")
             st.success(f"🌀 Motion: {dir_move} at {speed:.1f} km/h")
 
-# 💾 SAVE (NOW FIXED ✅)
+# 💾 SAVE + LOAD
 with colC:
     if st.button("💾 Save Inputs"):
         data = {
-            "forecast": {"lats": lats, "lons": lons, "hours": hours, "intensities": intensities},
-            "past": {"lats": past_lats, "lons": past_lons, "intensities": past_intensities}
+            "forecast":{"lats":lats,"lons":lons,"hours":hours,"intensities":intensities},
+            "past":{"lats":past_lats,"lons":past_lons,"intensities":past_intensities}
         }
-        st.download_button("📥 Download JSON",
-                           json.dumps(data, indent=4),
-                           file_name="typhoon.json")
+        st.download_button("📥 Download JSON", json.dumps(data, indent=4), "typhoon.json")
 
-    # ✅ LOAD FILE
-    uploaded_file = st.file_uploader("📂 Load File", type=["json"])
-
-    if uploaded_file is not None:
-        data = json.load(uploaded_file)
-
-        st.success("✅ File loaded!")
-
+    file = st.file_uploader("📂 Load File", ["json"])
+    if file:
+        data = json.load(file)
+        st.success("Loaded ✅")
         st.write(data)
