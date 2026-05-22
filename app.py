@@ -140,7 +140,7 @@ with colA:
             intensities=intensities
         )
 
-        fig.set_dpi(150)
+        fig.set_dpi(50)
         st.pyplot(fig)
 
 
