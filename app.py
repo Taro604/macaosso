@@ -18,7 +18,7 @@ if "past_rows" not in st.session_state:
     ]
 
 # buttons
-colA, colB = st.columns(2)
+colA, colB, colC = st.columns(3)
 
 with colA:
     if st.button("➕ Add Row"):
@@ -30,7 +30,50 @@ with colB:
     if st.button("➖ Remove Last"):
         if len(st.session_state.past_rows) > 0:
             st.session_state.past_rows.pop()
+import json
 
+with colC:
+
+    # ✅ SAVE BUTTON
+    if st.button("💾 Save Inputs"):
+
+        data = {
+            "forecast": {
+                "lats": lats,
+                "lons": lons,
+                "hours": hours,
+                "intensities": intensities
+            },
+            "past": {
+                "lats": past_lats,
+                "lons": past_lons,
+                "intensities": past_intensities
+            },
+            "wind_radii": {
+                "strong": [strong_NE, strong_SE, strong_SW, strong_NW],
+                "storm": [storm_NE, storm_SE, storm_SW, storm_NW]
+            }
+        }
+
+        json_data = json.dumps(data, indent=4)
+
+        st.download_button(
+            "📥 Download JSON",
+            json_data,
+            file_name="typhoon_input.json",
+            mime="application/json"
+        )
+
+    # ✅ LOAD FILE
+    uploaded_file = st.file_uploader("📂 Load File", type=["json"])
+
+    if uploaded_file is not None:
+        data = json.load(uploaded_file)
+
+        st.success("✅ File loaded!")
+
+        # ⚠️ Optional (just display for now)
+        st.write(data)
 # data containers
 past_lats = []
 past_lons = []
