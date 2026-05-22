@@ -150,7 +150,8 @@ with colA:
         fig = create_typhoon_map(
             lats, lons, hours,
             intensities, wind_radii,
-            past_lats, past_lons
+            past_lats, past_lons,
+            past_intensities
         )
         st.pyplot(fig)
 
