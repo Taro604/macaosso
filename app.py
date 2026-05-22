@@ -9,7 +9,8 @@ st.subheader("📍 Forecast Track Input")
 # =============================
 # TRACK INPUT (INDIVIDUAL BOXES)
 # =============================
-
+MACAU_LAT = 22.1595
+MACAU_LON = 113.5685
 # ✅ Fixed official forecast hours (no 36H)
 fixed_hours = [0, 12, 24, 48, 72, 96, 120]
 
@@ -80,25 +81,55 @@ storm_SE = col2.number_input("SE (storm)", value=0, step=10)
 storm_SW = col3.number_input("SW (storm)", value=0, step=10)
 storm_NW = col4.number_input("NW (storm)", value=0, step=10)
 
+import math
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371.0  # Earth radius (km)
+
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+
+    a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+
+    return R * c
+
+
+def bearing(lat1, lon1, lat2, lon2):
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    dlambda = math.radians(lon2 - lon1)
+
+    x = math.sin(dlambda) * math.cos(phi2)
+    y = math.cos(phi1)*math.sin(phi2) - math.sin(phi1)*math.cos(phi2)*math.cos(dlambda)
+
+    angle = math.degrees(math.atan2(x, y))
+    return (angle + 360) % 360
+
+
+def bearing_to_compass(angle):
+    directions = ["N","NNE","NE","ENE","E","ESE","SE","SSE",
+                  "S","SSW","SW","WSW","W","WNW","NW","NNW"]
+    index = int((angle + 11.25) // 22.5) % 16
+    return directions[index]
 # =============================
 # GENERATE BUTTON
 # =============================
-if st.button("🚀 Generate Map"):
 
-    try:
+colA, colB = st.columns(2)
+
+# =============================
+# GENERATE MAP BUTTON
+# =============================
+with colA:
+    if st.button("🚀 Generate Map"):
+
         wind_radii = {
-            "strong": [
-                (0, 90, strong_NE),
-                (90, 180, strong_SE),
-                (180, 270, strong_SW),
-                (270, 360, strong_NW),
-            ],
-            "storm": [
-                (0, 90, storm_NE),
-                (90, 180, storm_SE),
-                (180, 270, storm_SW),
-                (270, 360, storm_NW),
-            ]
+            "strong": [(0, 90, strong_NE), (90, 180, strong_SE),
+                       (180, 270, strong_SW), (270, 360, strong_NW)],
+            "storm": [(0, 90, storm_NE), (90, 180, storm_SE),
+                      (180, 270, storm_SW), (270, 360, storm_NW)]
         }
 
         fig = create_typhoon_map(
@@ -123,6 +154,22 @@ if st.button("🚀 Generate Map"):
             file_name="typhoon_map.png",
             mime="image/png"
         )
-
+        
     except Exception as e:
         st.error(f"Error generating map: {e}")
+# =============================
+# DISTANCE BUTTON ✅ NEW
+# =============================
+with colB:
+    if st.button("📏 Calculate Distance"):
+
+        lat0 = lats[0]
+        lon0 = lons[0]
+
+        dist = haversine(MACAU_LAT, MACAU_LON, lat0, lon0)
+        ang = bearing(MACAU_LAT, MACAU_LON, lat0, lon0)
+        direction = bearing_to_compass(ang)
+
+        st.success(
+            f"Distance from Macau: {direction} {dist:.0f} km"
+        )
