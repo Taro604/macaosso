@@ -3,10 +3,22 @@ import numpy as np
 from typhoon_map import create_typhoon_map
 
 st.title("🌪 Tropical Cyclone Track Generator")
+# ✅ initialize past track storage
 
 st.subheader("🕘 Past Track Input")
 
-num_past = st.slider("Number of past points", 0, 10, 3)
+colA, colB = st.columns([1,1])
+
+with colA:
+    if st.button("➕ Add Row"):
+        st.session_state.past_rows.append(
+            {"lat": 10.0, "lon": 145.0, "intensity": "TD"}
+        )
+
+with colB:
+    if st.button("➖ Remove Last"):
+        if len(st.session_state.past_rows) > 0:
+            st.session_state.past_rows.pop()
 
 past_lats = []
 past_lons = []
