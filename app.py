@@ -30,7 +30,7 @@ with colB:
             st.session_state.past_rows.pop()
 
 past_lats, past_lons, past_intensities = [], [], []
-intensity_options = ["LPA", "TD", "TS", "STS", "TY", "STY", "SuTY", "EX"]
+intensity_options = ["LPA","TD","TS","STS","TY","STY","SuTY","EX"]
 
 for i, row in enumerate(st.session_state.past_rows):
 
@@ -42,7 +42,7 @@ for i, row in enumerate(st.session_state.past_rows):
         value=row["lat"],
         step=0.1,
         format="%.1f",
-        key=f"plat{i}"   # ✅ fixed key
+        key=f"plat{i}"
     )
 
     lon = c2.number_input(
@@ -50,7 +50,7 @@ for i, row in enumerate(st.session_state.past_rows):
         value=row["lon"],
         step=0.1,
         format="%.1f",
-        key=f"plon{i}"   # ✅ fixed key
+        key=f"plon{i}"
     )
 
     intensity = c3.selectbox(
@@ -60,7 +60,11 @@ for i, row in enumerate(st.session_state.past_rows):
         key=f"pintensity{i}"
     )
 
-    st.session_state.past_rows[i] = {"lat": lat, "lon": lon, "intensity": intensity}
+    st.session_state.past_rows[i] = {
+        "lat": lat,
+        "lon": lon,
+        "intensity": intensity
+    }
 
     past_lats.append(lat)
     past_lons.append(lon)
@@ -85,15 +89,15 @@ for i in range(num_points):
 
     lat = c1.number_input(
         f"Lat ({hr}H)",
-        value=10.0,       # ✅ FIXED
+        value=10.0,
         step=0.1,
         format="%.1f",
-        key=f"flat{i}"    # ✅ avoid collision
+        key=f"flat{i}"
     )
 
     lon = c2.number_input(
         f"Lon ({hr}H)",
-        value=140.0,      # ✅ FIXED
+        value=140.0,
         step=0.1,
         format="%.1f",
         key=f"flon{i}"
@@ -112,21 +116,21 @@ for i in range(num_points):
     intensities.append(intensity)
 
 # ======================================
-# ✅ WIND RADII
+# ✅ WIND RADII (with keys ✅)
 # ======================================
 st.subheader("💨 Wind Radii (km)")
 
 c1,c2,c3,c4 = st.columns(4)
-strong_NE = c1.number_input("NE", 0)
-strong_SE = c2.number_input("SE", 0)
-strong_SW = c3.number_input("SW", 0)
-strong_NW = c4.number_input("NW", 0)
+strong_NE = c1.number_input("NE", 0, key="strong_NE")
+strong_SE = c2.number_input("SE", 0, key="strong_SE")
+strong_SW = c3.number_input("SW", 0, key="strong_SW")
+strong_NW = c4.number_input("NW", 0, key="strong_NW")
 
 c1,c2,c3,c4 = st.columns(4)
-storm_NE = c1.number_input("Storm NE", 0)
-storm_SE = c2.number_input("Storm SE", 0)
-storm_SW = c3.number_input("Storm SW", 0)
-storm_NW = c4.number_input("Storm NW", 0)
+storm_NE = c1.number_input("Storm NE", 0, key="storm_NE")
+storm_SE = c2.number_input("Storm SE", 0, key="storm_SE")
+storm_SW = c3.number_input("Storm SW", 0, key="storm_SW")
+storm_NW = c4.number_input("Storm NW", 0, key="storm_NW")
 
 # ======================================
 # ✅ HELPER FUNCTIONS
@@ -176,7 +180,6 @@ with colB:
     if st.button("📏 Distance & Motion"):
 
         if len(lats) >= 2:
-
             MACAU_LAT, MACAU_LON = 22.1595, 113.5685
 
             d_macau = haversine(MACAU_LAT,MACAU_LON,lats[0],lons[0])
@@ -194,17 +197,70 @@ with colB:
             st.success(f"📍 Macau: {dir_macau} {d_macau:.0f} km")
             st.success(f"🌀 Motion: {dir_move} at {speed:.1f} km/h")
 
-# 💾 SAVE + LOAD
+# 💾 SAVE + LOAD ✅ FULL
 with colC:
+
     if st.button("💾 Save Inputs"):
         data = {
-            "forecast":{"lats":lats,"lons":lons,"hours":hours,"intensities":intensities},
-            "past":{"lats":past_lats,"lons":past_lons,"intensities":past_intensities}
+            "forecast":{
+                "lats":lats,
+                "lons":lons,
+                "hours":hours,
+                "intensities":intensities
+            },
+            "past":{
+                "lats":past_lats,
+                "lons":past_lons,
+                "intensities":past_intensities
+            },
+            "wind_radii":{
+                "strong":[strong_NE,strong_SE,strong_SW,strong_NW],
+                "storm":[storm_NE,storm_SE,storm_SW,storm_NW]
+            }
         }
-        st.download_button("📥 Download JSON", json.dumps(data, indent=4), "typhoon.json")
+
+        st.download_button(
+            "📥 Download JSON",
+            json.dumps(data, indent=4),
+            file_name="typhoon.json"
+        )
 
     file = st.file_uploader("📂 Load File", ["json"])
+
     if file:
         data = json.load(file)
-        st.success("Loaded ✅")
-        st.write(data)
+
+        # forecast
+        if "forecast" in data:
+            for i in range(len(data["forecast"]["lats"])):
+                st.session_state[f"flat{i}"] = data["forecast"]["lats"][i]
+                st.session_state[f"flon{i}"] = data["forecast"]["lons"][i]
+                st.session_state[f"fintensity{i}"] = data["forecast"]["intensities"][i]
+
+        # past
+        if "past" in data:
+            st.session_state.past_rows = []
+            for i in range(len(data["past"]["lats"])):
+                st.session_state.past_rows.append({
+                    "lat": data["past"]["lats"][i],
+                    "lon": data["past"]["lons"][i],
+                    "intensity": data["past"]["intensities"][i]
+                })
+
+        # wind radii
+        if "wind_radii" in data:
+            strong = data["wind_radii"]["strong"]
+            storm = data["wind_radii"]["storm"]
+
+            st.session_state["strong_NE"] = strong[0]
+            st.session_state["strong_SE"] = strong[1]
+            st.session_state["strong_SW"] = strong[2]
+            st.session_state["strong_NW"] = strong[3]
+
+            st.session_state["storm_NE"] = storm[0]
+            st.session_state["storm_SE"] = storm[1]
+            st.session_state["storm_SW"] = storm[2]
+            st.session_state["storm_NW"] = storm[3]
+
+        st.success("✅ All inputs restored!")
+        st.rerun()
