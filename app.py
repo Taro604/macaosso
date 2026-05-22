@@ -175,4 +175,3 @@ with colC:
         st.download_button("📥 Download JSON",
                            json.dumps(data, indent=4),
                            file_name="typhoon.json")
-``
