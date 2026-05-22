@@ -41,14 +41,22 @@ for i, row in enumerate(st.session_state.past_rows):
 
     col1, col2, col3 = st.columns(3)
 
-    lat = col1.number_input(f"Past Lat {i+1}",
-                            value=row["lat"], step=0.1, format="%.1f",
-                            key=f"plat{i}")
+    lat = col1.number_input(
+    f"Lat ({hr}H)",
+    value=10.0,        # ✅ FIX
+    step=0.1,
+    format="%.1f",
+    key=f"lat{i}"
+    )
 
-    lon = col2.number_input(f"Past Lon {i+1}",
-                            value=row["lon"], step=0.1, format="%.1f",
-                            key=f"plon{i}")
-
+    lon = col2.number_input(
+    f"Lon ({hr}H)",
+    value=140.0,       # ✅ FIX
+    step=0.1,
+    format="%.1f",
+    key=f"lon{i}"
+    )
+    
     intensity = col3.selectbox(f"Intensity {i+1}",
                                intensity_options,
                                index=intensity_options.index(row["intensity"]),
