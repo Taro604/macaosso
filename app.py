@@ -117,7 +117,7 @@ def bearing_to_compass(angle):
 # GENERATE BUTTON
 # =============================
 
-colA, colB = st.columns(2)
+colA, colB, colC = st.columns(3)
 
 # =============================
 # GENERATE MAP BUTTON
@@ -171,3 +171,28 @@ with colB:
         st.success(
             f"Distance from Macau: {direction} {dist:.0f} km"
         )
+
+
+with colC:
+    if st.button("🌀 Calculate Motion"):
+
+        if len(lats) < 2:
+            st.error("Need at least 0H and 12H points")
+        else:
+            lat0, lon0 = lats[0], lons[0]
+            lat1, lon1 = lats[1], lons[1]
+
+            dist = haversine(lat0, lon0, lat1, lon1)
+            ang = bearing(lat0, lon0, lat1, lon1)
+
+            direction = bearing_to_compass(ang)
+
+            # hours difference (normally 12h)
+            time_diff = hours[1] - hours[0]
+
+            speed = dist / time_diff  # km/h
+
+            st.success(
+                f"Movement: {direction} at {speed:.1f} km/h"
+            )
+
