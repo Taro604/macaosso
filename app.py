@@ -5,9 +5,20 @@ from typhoon_map import create_typhoon_map
 st.title("🌪 Tropical Cyclone Track Generator")
 # ✅ initialize past track storage
 
+# ======================================
+# ✅ PAST TRACK (DYNAMIC ROWS)
+# ======================================
+
 st.subheader("🕘 Past Track Input")
 
-colA, colB = st.columns([1,1])
+# initialize
+if "past_rows" not in st.session_state:
+    st.session_state.past_rows = [
+        {"lat": 10.0, "lon": 145.0, "intensity": "TD"}
+    ]
+
+# buttons
+colA, colB = st.columns(2)
 
 with colA:
     if st.button("➕ Add Row"):
@@ -20,43 +31,53 @@ with colB:
         if len(st.session_state.past_rows) > 0:
             st.session_state.past_rows.pop()
 
+# data containers
 past_lats = []
 past_lons = []
-past_intensities = []  # ✅ NEW
+past_intensities = []
 
 intensity_options = ["LPA", "TD", "TS", "STS", "TY", "STY", "SuTY", "EX"]
 
-for i in range(num_past):
+# ✅ Dynamic loop (NO num_past anymore)
+for i, row in enumerate(st.session_state.past_rows):
+
     st.write(f"Past Point {i+1}")
 
     col1, col2, col3 = st.columns(3)
 
-    plat = col1.number_input(
+    lat = col1.number_input(
         f"Past Lat {i+1}",
-        value=10.0,
+        value=row["lat"],
         step=0.1,
         format="%.1f",
         key=f"plat{i}"
     )
 
-    plon = col2.number_input(
+    lon = col2.number_input(
         f"Past Lon {i+1}",
-        value=145.0,
+        value=row["lon"],
         step=0.1,
         format="%.1f",
         key=f"plon{i}"
     )
 
-    pintensity = col3.selectbox(
+    intensity = col3.selectbox(
         f"Intensity {i+1}",
         intensity_options,
-        index=1,   # default TD
+        index=intensity_options.index(row["intensity"]),
         key=f"pintensity{i}"
     )
 
-    past_lats.append(plat)
-    past_lons.append(plon)
-    past_intensities.append(pintensity)
+    # update stored values
+    st.session_state.past_rows[i] = {
+        "lat": lat,
+        "lon": lon,
+        "intensity": intensity
+    }
+
+    past_lats.append(lat)
+    past_lons.append(lon)
+    past_intensities.append(intensity)
     
 st.subheader("📍 Forecast Track Input")
 
