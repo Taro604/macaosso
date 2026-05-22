@@ -174,7 +174,7 @@ with colB:
 
 
 with colC:
-    if st.button("12H moving speed and direction"):
+    if st.button("Moving Speed"):
 
         if len(lats) < 2:
             st.error("Need at least 0H and 12H points")
