@@ -32,6 +32,8 @@ with colB:
             st.session_state.past_rows.pop()
 import json
 
+import json
+
 with colC:
 
     # ✅ SAVE BUTTON
@@ -64,16 +66,15 @@ with colC:
             mime="application/json"
         )
 
-    # ✅ LOAD FILE
+
+    # ✅ LOAD BUTTON
     uploaded_file = st.file_uploader("📂 Load File", type=["json"])
 
     if uploaded_file is not None:
         data = json.load(uploaded_file)
-
         st.success("✅ File loaded!")
-
-        # ⚠️ Optional (just display for now)
         st.write(data)
+
 # data containers
 past_lats = []
 past_lons = []
